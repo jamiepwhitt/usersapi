@@ -12,10 +12,13 @@ public class User {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
+	 @Size(max=20)
     private String first_name;
+	 @Size(min=2)
 	private String last_name;
 	private String state;
 	
+	@Size(min=4, max=20)
 	public User(){
 	   
 	}
@@ -35,6 +38,7 @@ public class User {
 		this.id = id;
 	}
 
+	
 	public String getFirst_name() {
 		return first_name;
 	}

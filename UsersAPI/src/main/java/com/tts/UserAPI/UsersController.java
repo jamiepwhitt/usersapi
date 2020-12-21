@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,14 +42,26 @@ public class UsersController {
 	    }
 
 	    @PostMapping("/users")
-	    public void createUser(@RequestBody User user){
-	    userRepository.save(user);
-	    }
+	    public ResponseEntity<Void> createUser(@RequestBody @Valid User user,   BindingResult bindingResult){
+	    	 if (bindingResult.hasErrors()) {
+	    	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	    	    }
+	    	    userRepository.save(user);
+	    	    return new ResponseEntity<>(HttpStatus.CREATED);
+	    	}
 	    
 	    @PutMapping("/users/{id}")
-	    public void changeUser(@PathVariable(value="id") Long id, @RequestBody User user){
-	    userRepository.save(user);
+	    public ResponseEntity<Void> changeUser(@PathVariable(value="id") Long id, @RequestBody User user,  BindingResult bindingResult){
+	    	if (userRepository.findById(user.getId()) != null){
+	            bindingResult.rejectValue("Id", "error.Id", "Id does not exist.");
+	        }
+	        if (bindingResult.hasErrors()) {
+	            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	        }
+	        userRepository.save(user);
+	        return new ResponseEntity<>(HttpStatus.CREATED);
 	    }
+	    
 	    
 	    @DeleteMapping("/users/{id}")
 	    public void createUser(@PathVariable(value="id") Long id){
